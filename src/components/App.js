@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
 import AppRouter from "components/Router";
-import { authService } from "fbase";
+import { authService, firebaseInstance } from "fbase";
 
 function App() {
   const [init, setInit] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    authService.onAuthStateChanged(authService.auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
+    authService.onAuthStateChanged(
+      authService.getAuth(firebaseInstance),
+      (user) => {
+        if (user) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+        setInit(true);
       }
-      setInit(true);
-    });
+    );
   }, []);
 
   return (
