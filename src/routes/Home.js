@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 const Home = ({ userObj }) => {
   const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
-  const [attachment, setAttachment] = useState();
+  const [attachment, setAttachment] = useState("");
   useEffect(() => {
     return dbService.onSnapshot(
       dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
