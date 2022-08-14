@@ -5,6 +5,7 @@ import { dbService, firebaseInstance } from "../fbase";
 const Home = ({ userObj }) => {
   const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
+  const [attachment, setAttachment] = useState();
   useEffect(() => {
     return dbService.onSnapshot(
       dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
@@ -42,10 +43,14 @@ const Home = ({ userObj }) => {
     const theFile = files[0];
     const reader = new FileReader();
     reader.onload = (finishedEvent) => {
-      console.log(finishedEvent.target.result);
+      const {
+        target: { result },
+      } = finishedEvent;
+      setAttachment(result);
     };
     reader.readAsDataURL(theFile);
   };
+  const onClearAttachmentClick = () => setAttachment("");
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -58,6 +63,12 @@ const Home = ({ userObj }) => {
         />
         <input type="file" accept="image/*" onChange={onFileChange} />
         <input type="submit" value={"Nweet"} />
+        {attachment && (
+          <div>
+            <img src={attachment} width="50px" height="50px" />
+            <button onClick={onClearAttachmentClick}>Clear</button>
+          </div>
+        )}
       </form>
       <div>
         {nweets.map((nweet) => (
