@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { authService, dbService, firebaseInstance } from "fbase";
 import { useNavigate } from "react-router-dom";
 
-const Profile = ({ userObj }) => {
+const Profile = ({ userObj, refreshUser }) => {
   const navigate = useNavigate();
   const getNweets = async () => {
     const querySnapshot = await dbService.getDocs(
@@ -36,6 +36,7 @@ const Profile = ({ userObj }) => {
     event.preventDefault();
     if (newDisplayName !== userObj.displayName) {
       await authService.updateProfile(userObj, { displayName: newDisplayName });
+      refreshUser();
     }
   };
 

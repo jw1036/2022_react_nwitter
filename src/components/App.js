@@ -5,7 +5,13 @@ import { authService, firebaseInstance } from "fbase";
 function App() {
   const [init, setInit] = useState(false);
   const [userObj, setUserObj] = useState(null);
-
+  const refreshUser = async () => {
+    await authService.updateCurrentUser(
+      authService.getAuth(firebaseInstance),
+      authService.getAuth(firebaseInstance).currentUser
+    );
+    setUserObj(authService.getAuth(firebaseInstance).currentUser);
+  };
   useEffect(() => {
     authService.onAuthStateChanged(
       authService.getAuth(firebaseInstance),
@@ -19,7 +25,11 @@ function App() {
   return (
     <>
       {init ? (
-        <AppRouter isLoggedIn={Boolean(userObj)} userObj={userObj} />
+        <AppRouter
+          isLoggedIn={Boolean(userObj)}
+          userObj={userObj}
+          refreshUser={refreshUser}
+        />
       ) : (
         "Initializing..."
       )}
