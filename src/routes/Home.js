@@ -21,24 +21,28 @@ const Home = ({ userObj }) => {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
-    const storage = storageService.getStorage(firebaseInstance);
-    const fileRef = storageService.ref(storage, `${userObj.uid}/${uuidv4()}`);
-    const response = await storageService.uploadString(
-      fileRef,
-      attachment,
-      "data_url"
+    let attachmentUrl = "";
+    if (attachment !== "") {
+      const storage = storageService.getStorage(firebaseInstance);
+      const fileRef = storageService.ref(storage, `${userObj.uid}/${uuidv4()}`);
+      const response = await storageService.uploadString(
+        fileRef,
+        attachment,
+        "data_url"
+      );
+      attachmentUrl = await storageService.getDownloadURL(response.ref);
+    }
+    await dbService.addDoc(
+      dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
+      {
+        text: nweet,
+        createdAt: Date.now(),
+        creatorId: userObj.uid,
+        attachmentUrl,
+      }
     );
-    console.log(response);
-
-    // await dbService.addDoc(
-    //   dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
-    //   {
-    //     text: nweet,
-    //     createdAt: Date.now(),
-    //     creatorId: userObj.uid,
-    //   }
-    // );
     setNweet("");
+    setAttachment("");
   };
   const onChange = (event) => {
     const {
