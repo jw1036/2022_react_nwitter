@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { dbService, firebaseInstance } from "fbase";
+import { dbService, firebaseInstance, storageService } from "fbase";
 
 function Nweet({ nweetObj, isOwner }) {
   const [editing, setEditing] = useState(false);
@@ -31,6 +31,12 @@ function Nweet({ nweetObj, isOwner }) {
         dbService.doc(
           dbService.getFirestore(firebaseInstance),
           `nweets/${nweetObj.id}`
+        )
+      );
+      await storageService.deleteObject(
+        storageService.ref(
+          storageService.getStorage(firebaseInstance),
+          nweetObj.attachmentUrl
         )
       );
     }
