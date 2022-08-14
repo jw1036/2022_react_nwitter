@@ -8,7 +8,7 @@ import Navigator from "components/Navigator";
 const AppRouter = ({ isLoggedIn, userObj }) => {
   return (
     <Router>
-      {isLoggedIn && <Navigator />}
+      {isLoggedIn && <Navigator userObj={userObj} />}
       <Routes>
         {isLoggedIn ? (
           <>
