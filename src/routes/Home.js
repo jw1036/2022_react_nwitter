@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { dbService, firebaseInstance } from "../fbase";
 
-const Home = () => {
+const Home = ({ userObj }) => {
   const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
-  const getNweets = async () => {
-    const querySnapshot = await dbService.getDocs(
-      dbService.collection(dbService.getFirestore(firebaseInstance), "nweets")
-    );
-    const dbNweets = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-    setNweets(dbNweets);
-  };
   useEffect(() => {
-    getNweets();
+    return dbService.onSnapshot(
+      dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
+      (snapshop) => {
+        const nweetArray = snapshop.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setNweets(nweetArray);
+      }
+    );
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
     await dbService.addDoc(
       dbService.collection(dbService.getFirestore(firebaseInstance), "nweets"),
       {
-        nweet,
+        text: nweet,
         createdAt: Date.now(),
+        creatorId: userObj.uid,
       }
     );
     setNweet("");
@@ -49,7 +49,7 @@ const Home = () => {
       <div>
         {nweets.map((nweet) => (
           <div key={nweet.id}>
-            <h4>{nweet.nweet}</h4>
+            <h4>{nweet.text}</h4>
           </div>
         ))}
       </div>
