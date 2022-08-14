@@ -1,13 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
+import { dbService, firebaseInstance } from "fbase";
 
 function Nweet({ nweetObj, isOwner }) {
+  const [editing, setEditing] = useState(false);
+  const [newNweet, setNewNweet] = useState(nweetObj.text);
+  const toggleEditing = () => setEditing((prev) => !prev);
+  const onChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setNewNweet(value);
+  };
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    await dbService.updateDoc(
+      dbService.doc(
+        dbService.getFirestore(firebaseInstance),
+        `nweets/${nweetObj.id}`
+      ),
+      {
+        text: newNweet,
+      }
+    );
+    setEditing(false);
+  };
+  const onDeleteClick = async () => {
+    const ok = window.confirm("Are you sure you want to delete this nweet?");
+    if (ok) {
+      await dbService.deleteDoc(
+        dbService.doc(
+          dbService.getFirestore(firebaseInstance),
+          `nweets/${nweetObj.id}`
+        )
+      );
+    }
+  };
   return (
-    <div key={nweetObj.id}>
-      <h4>{nweetObj.text}</h4>
-      {isOwner && (
+    <div>
+      {editing ? (
         <>
-          <button>Delete Nweet</button>
-          <button>Edit Nweet</button>
+          <form onSubmit={onSubmit}>
+            <input
+              type={"text"}
+              placeholder="Edit your nweet"
+              value={newNweet}
+              required
+              onChange={onChange}
+            />
+            <input type={"submit"} value="Update Nweet" />
+          </form>
+          <button onClick={toggleEditing}>Cancel</button>
+        </>
+      ) : (
+        <>
+          <h4>{nweetObj.text}</h4>
+          {isOwner && (
+            <>
+              <button onClick={onDeleteClick}>Delete Nweet</button>
+              <button onClick={toggleEditing}>Edit Nweet</button>
+            </>
+          )}
         </>
       )}
     </div>
